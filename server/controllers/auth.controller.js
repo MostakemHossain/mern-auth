@@ -26,14 +26,66 @@ export const register= async(req,res)=>{
             sameSite: process.env.NODE_ENV ==="production" ? "none" : "strict",
             maxAge:1*24*60*60*1000
 
-        });        
+        }); 
+        return res.json({
+            status:true,
+            message:"Registration successfully",
+        })
     } catch (error) {
-        res.json({
+      return  res.json({
+            status: false,
+            message: error.message
+
+        })  
+    }
+    
+}
+
+export const login=async(req,res)=>{
+    const {email,password}=req.body;
+    try {
+        const existingUser=await userModel.findOne({email});
+        if(!existingUser){
+            return res.json({
+                status: false,
+                message: "Invalid email"
+    
+            })   
+        };
+        const isMatch=await bcrypt.compare(password,existingUser.password);
+        if(!isMatch){
+            return res.json({
+                status: false,
+                message: "Invalid  password "
+            })
+        }
+        const token= jwt.sign({
+            id:user._id,},
+        process.env.JWT_SECRET,
+        {
+            expiresIn:process.env.JWT_EXPIRES
+        }
+        );
+
+        res.cookie("token",token,{
+            httpOnly:true,
+            secure:process.env.NODE_ENV ==="production",
+            sameSite: process.env.NODE_ENV ==="production" ? "none" : "strict",
+            maxAge:1*24*60*60*1000
+
+        });   
+        
+        return res.json({
+            status:true,
+            message:"logged in successfully",
+        })
+        
+    } catch (error) {
+       return res.json({
             status: false,
             message: error.message
 
         })
         
     }
-    
 }
