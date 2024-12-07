@@ -1,5 +1,5 @@
 
-const validateRequest =
+export const validateRequest =
   (schema) =>
   async (req, res, next) => {
     try {
@@ -12,4 +12,3 @@ const validateRequest =
     }
   };
 
-export default validateRequest;

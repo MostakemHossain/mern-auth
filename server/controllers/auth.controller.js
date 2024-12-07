@@ -8,7 +8,7 @@ export const register= async(req,res)=>{
         if(existingUser){
             return res.status(400).json({msg:"User already exists"});
         }
-        const hashedPassword= await bcrypt.hash(password,process.env.HASH_PASSWORD);
+        const hashedPassword = await bcrypt.hash(password, parseInt(process.env.HASH_PASSWORD));
         const user=new userModel({name,email,password:hashedPassword});
         await user.save();
 
@@ -59,14 +59,11 @@ export const login=async(req,res)=>{
                 message: "Invalid  password "
             })
         }
-        const token= jwt.sign({
-            id:user._id,},
-        process.env.JWT_SECRET,
-        {
-            expiresIn:process.env.JWT_EXPIRES
-        }
+        const token = jwt.sign(
+            { id: existingUser._id },
+            process.env.JWT_SECRET,
+            { expiresIn: process.env.JWT_EXPIRES }
         );
-
         res.cookie("token",token,{
             httpOnly:true,
             secure:process.env.NODE_ENV ==="production",
